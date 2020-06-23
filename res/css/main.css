@@ -1,0 +1,22 @@
+@font-face {
+    font-family: OpenSans;
+    src: url('../fonts/OpenSans-Bold.ttf');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: OpenSans;
+    src: url('../fonts/OpenSans-Regular.ttf');
+    font-weight: normal;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: OpenSans;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    font-size: 14px;
+}
