@@ -20,3 +20,35 @@ body {
     margin: 0;
     font-size: 14px;
 }
+
+.m-center{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.view {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100vw;
+    animation: view .4s;
+}
+
+.no-anim {
+    animation: none !important;
+}
+
+@keyframes view {
+    0% {
+        margin-left: 100px;
+        opacity: 0;
+    }
+}

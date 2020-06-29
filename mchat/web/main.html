@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        if (localStorage.getItem("mchat_username") === null)
+            window.location.href = "index.html";
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="res/css/bootstrap.min.css">
+    <link rel="stylesheet" href="res/css/main.css">
+    <link rel="shortcut icon" href="res/icons/mchat_icon_256.png" type="image/x-icon">
+    <title>MChat</title>
+</head>
+
+<body>
+    <div id="user-name"></div>
+    <button class="btn btn-primary"
+        onclick="localStorage.removeItem('mchat_username');window.location.reload()">Logout</button>
+    <script src="res/js/jquery-3.5.1.min.js"></script>
+    <script src="res/js/view.js"></script>
+    <script>
+        $('#user-name').html(localStorage.getItem('mchat_user_name'));
+    </script>
+</body>
+
+</html>

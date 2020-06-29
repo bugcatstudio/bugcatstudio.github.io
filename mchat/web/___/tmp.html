@@ -1,0 +1,414 @@
+<!--
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="res/icons/mchat_icon_256.png" type="image/x-icon">
+    <link rel="stylesheet" href="res/css/bootstrap.css">
+    <link rel="stylesheet" href="res/css/main.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-storage.js"></script>
+    <title>MChat</title>
+    <style>
+        .view {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100vw;
+            animation: view .4s;
+        }
+
+        input {
+            outline: none;
+        }
+
+        .tab {
+            border-radius: 6px;
+            transition: 1s;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .tab-open {
+            border: 1px solid #dddddd;
+            max-height: 70vh;
+            padding: 15px;
+            opacity: 1;
+        }
+
+        @keyframes view {
+            0% {
+                margin-left: 100px;
+                opacity: 0;
+            }
+        }
+
+        .no-anim {
+            animation: none !important;
+        }
+
+        .splash-anim {
+            animation: splash 1s forwards, splash-2 1s 1.2s forwards;
+            transform-origin: 50% 100%;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        @keyframes splash {
+            0% {
+                transform: scaleX(0.3) scaleY(1.8);
+            }
+
+            30% {
+                transform: scaleX(0.5) scaleY(1.5);
+            }
+
+            70% {
+                transform: scaleX(1.5) scaleY(0.5);
+            }
+        }
+
+        @keyframes splash-2 {
+            0% {
+                transform-origin: 50% 50%;
+            }
+
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .header,
+        .header2 {
+            background-color: #2299ff;
+            padding: 10px 8px 10px 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .header2 {
+            background-color: #fff;
+            color: #222222;
+            border-bottom: 1px solid #eeeeee;
+            padding: 14px 20px;
+        }
+
+        .profile-icon,
+        .profile-icon2 {
+            width: 30px;
+            border-radius: 50%;
+            border: 1px solid #dddddd;
+            margin-right: 16px;
+        }
+
+        .profile-icon2 {
+            border: none;
+        }
+
+        .chat {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .chats {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chats>hr {
+            margin: 0 20px 0 70px;
+            border-color: #eeeeee;
+        }
+
+        #loader {
+            z-index: 99;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+        }
+
+        #loader div {
+            padding: 14px;
+            border: 5px solid #2299ff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: 1s loading infinite linear;
+        }
+
+        @keyframes loading {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="view m-center no-anim" id="splash">
+        <img src="res/icons/mchat_icon_256.png" class="splash-anim" style="width: 130px;">
+    </div>
+    <div class="view m-center" id="first-splash">
+        <div>
+            <img src="res/icons/mchat_banner.png" style="width: 240px;">
+        </div>
+        <div class="text-center">
+            <div onclick="tab(this)" style="cursor: pointer;">
+                <div>
+                    <img src="res/icons/info-btn.png" style="width: 20px;margin-bottom: 4px;">
+                    Know more
+                </div>
+                <div class="tab m-4">
+                    <img src="res/icons/bugcat_banner.png" style="width: 180px;"><br>
+                    <a href="https://bugcatstudio.ga">https://bugcatstudio.ga</a>
+                    <hr>
+                    by Munish Kumar
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary w-50" style="max-width: 180px;" onclick="view('login-view')">Get Started</button>
+    </div>
+
+<div class="view m-center" id="login-view">
+    <div>
+        <h5 class="text-center">Login</h5><br>
+        <div class="py-3 text-danger" id="l-err"></div>
+        Username <br>
+        <input type="text" id="l-u" class="border rounded p-2 w-100"><br><br>
+        Password <br>
+        <input type="password" id="l-p" class="border rounded p-2 w-100"><br><br>
+        <button class="btn btn-primary w-100" onclick="login()">Login</button>
+        <div class="text-center">
+            <br>
+            <hr>
+            <a href="javascript:view('signup-view')">Create Account</a><br>
+            
+                    <a href="javascript:view('forgot-view')">Forgot Password</a><br>
+                
+<button class="btn btn-warning" onclick="test()">Test</button>
+</div>
+</div>
+</div>
+<div class="view m-center" id="signup-view">
+    <div>
+        <div class="text-center">
+            <img onclick="view('login-view')" src="res/icons/back-btn.png" style="width: 30px;cursor: pointer;">
+            <br><br>
+        </div>
+        <h5 class="text-center">Create Account</h5>
+        <div class="py-3 text-danger" id="s-err-1"></div>
+        Username* <br>
+        <input type="text" id="s-u" class="border rounded p-2 w-100"><br><br>
+        Email* <br>
+        <input type="email" id="s-e" class="border rounded p-2 w-100"><br><br>
+        Password* <br>
+        <input type="password" id="s-p" class="border rounded p-2 w-100"><br><br>
+        <button class="btn btn-primary w-100" onclick="signup_0()">Next</button>
+        <hr>
+        <a href="javascript:view('signup-view-2')">[signup-view-2]</a>
+    </div>
+</div>
+<div class="view m-center" id="signup-view-2">
+    <div>
+        <div class="text-center">
+            <img onclick="view('signup-view')" src="res/icons/back-btn.png" style="width: 30px;cursor: pointer;">
+            <br><br>
+        </div>
+        <h5 class="text-center">Personal Details</h5><br>
+        <label for="s-i" class="d-block text-center">
+            <img src="res/icons/default.jpg" style="width: 50px;border-radius: 50%; border: 3px solid #bbbbbb;"><br>
+            <div class="m-2">Select Image</div>
+        </label>
+        <input type="file" id="s-i" hidden>
+        <br>
+        <div class="py-3 text-danger" id="s-err-2"></div>
+        Name* <br>
+        <input type="text" id="s-n" class="border rounded p-2 w-100"><br><br>
+        Gender <br>
+        <select id="s-g" class="border rounded p-2 w-100 bg-light">
+            <option value="Unknown">Prefer not to Say</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <br><br>
+        <button class="btn btn-primary w-100" onclick="signup()">Create</button>
+    </div>
+</div>
+<div class="view m-center" id="forgot-view">
+    <form method="post" id="forgot-form">
+        <div class="text-center">
+            <img onclick="view('login-view')" src="res/icons/back-btn.png" style="width: 30px;cursor: pointer;">
+            <br><br>
+        </div>
+        <h5 class="text-center">Reset Password</h5><br>
+        Username <br>
+        <input type="text" name="user" class="border rounded p-2 w-100"><br><br>
+        <button class="btn btn-primary w-100">Send Verification Code</button>
+        <hr>
+        <a href="javascript:view('forgot-view-2')">[forgot-view-2]</a>
+    </form>
+</div>
+<div class="view m-center" id="forgot-view-2">
+    <form method="post" id="forgot-form-2">
+        <h5 class="text-center">Reset Password</h5><br>
+        Verification Code <br>
+        <input type="text" name="user" class="border rounded p-2 w-100"><br><br>
+        New Password <br>
+        <input type="text" name="user" class="border rounded p-2 w-100"><br><br>
+        <button class="btn btn-primary w-100">Done</button>
+        <hr>
+        <div class="text-center">
+            <a href="javascript:view('login-view')">Cancel</a>
+        </div>
+    </form>
+</div>
+-->
+<div class="view" id="main-view">
+    <div class="header">
+        <img src="res/icons/default.jpg" class="profile-icon">
+        <span id="user-name"></span>
+        <div style="flex-grow: 1;"></div>
+        <img src="res/icons/side-menu.png" style="height: 34px;cursor: pointer;" onclick="view('setting-view')">
+    </div>
+    <div style="border-bottom: 1px solid #eeeeee;display: flex;">
+        <div class="text-center" style="flex-grow: 1;padding: 12px;background-color: #eeeeee;">Chats
+        </div>
+        <div class="text-center" style="flex-grow: 1;padding: 12px;">Start New</div>
+    </div>
+    <div class="chats">
+        <!--
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+            <div class="chat">
+                <img src="res/icons/default.jpg" class="profile-icon">
+                Munish
+            </div>
+            <hr>
+        -->
+        <div style="flex-grow: 1;" class="m-center">
+            <h5>Nothing here</h5>
+            <p>
+                Start new chat
+            </p>
+        </div>
+    </div>
+</div>
+<div class="view" id="setting-view">
+    <div class="header2">
+        <img onclick="view('main-view')" src="res/icons/back-btn.png" class="profile-icon2">
+        Setting
+    </div>
+    <div class="px-3">
+        <div class="chat" onclick="localStorage.removeItem('user');window.location.reload()">
+            <img src="res/icons/logout-icon.png" class="profile-icon2">
+            Logout
+        </div>
+        <div class="chat">
+            <img src="res/icons/info-btn.png" class="profile-icon2">
+            About
+        </div>
+    </div>
+</div>
+<div class="view m-center" id="offline-view">
+    <img src="res/icons/mchat_icon_256.png" style="width: 100px;">
+    <h5>Hm..</h5>
+    <p>Seems you are Offline</p><br><br>
+    <button class="btn btn-primary" onclick="window.location.reload()">Try Again</button>
+</div>
+
+<script src="cordova.js"></script>
+<script src="cordova_plugins.js"></script>
+
+<div id="loader">
+    <div></div>
+</div>
+<script src="res/js/jquery.js"></script>
+<script src="res/js/view.js"></script>
+<script>
+    view('splash');
+    setTimeout(function () {
+        if (localStorage.getItem('user') !== null) {
+            view('main-view');
+            u = localStorage.getItem("user");
+            ufetch(u);
+        } else
+            view('first-splash');
+    }, 2200);
+    document.addEventListener("offline", offline, false);
+    document.addEventListener("backbutton", back, false);
+    function back(e) {
+        e.preventDefault();
+    }
+    function offline() {
+        view('offline-view');
+    }
+    function loading(s) {
+        if (s)
+            document.querySelector('#loader').style.display = "flex";
+        else {
+            setTimeout(function () {
+                document.querySelector('#loader').style.display = "none";
+            }, 500);
+        }
+    }
+    function test() {
+        $.ajax({
+            type: "POST",
+            url: "http://app.bugcatstudio.ga_/mchat/auth.php",
+            data: { name: "Munish", pass: "1234" },
+            success: function (e) {
+                $('#l-err').html(e);
+            }
+        });
+    }
+</script>
+<script src="res/js/config.js"></script>
+</body>
+
+</html>

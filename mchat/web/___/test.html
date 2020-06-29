@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="file" id="photo">
+    <button onclick="upload_file()">Submit</button>
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.4/firebase-storage.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyCyaI92YI1WAtnaaKwIJkiU4ToPDJy-6hg",
+            authDomain: "mchat-bugcatstudio.firebaseapp.com",
+            databaseURL: "https://mchat-bugcatstudio.firebaseio.com",
+            projectId: "mchat-bugcatstudio",
+            storageBucket: "mchat-bugcatstudio.appspot.com",
+            messagingSenderId: "46112448501",
+            appId: "1:46112448501:web:f66a228a6dcc363bf78abc",
+            measurementId: "G-FEBTS4WKBB"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const st = firebase.storage();
+        
+        function signup(u, p, n, g) {
+            db.ref('users/' + u).once('value', function (data) {
+                if (data.val() == null) {
+                    file = document.querySelector('#photo').files[0];
+                    pic = u + '.' + file.name.split('.')[1];
+                    db.ref('users/' + u).set({
+                        pass: p,
+                        name: n,
+                        profile: pic
+                    }).then(function () {
+                        console.log("Done");
+                    });
+                    st.ref().child('users/' + pic).put(file).then(function () {
+                        console.log("Done2");
+                    });
+                } else {
+                    console.log("Username already exists.");
+                }
+            });
+        }
+        function login(u, p) {
+            db.ref('users/' + u).once('value', function (data) {
+                if (data.val() == null) {
+                    console.log("Username dosen't exists.");
+                } else {
+                    if (p == data.val().pass) {
+                        console.log("Good");
+                    } else {
+                        console.log("Bad");
+                    }
+                }
+            });
+        }
+        function reset(u, p) {
+            db.ref('users/' + u).once('value', function (data) {
+                if (data.val() == null) {
+                    console.log("Username dosen't exists.");
+                } else {
+                    db.ref('users/' + u).update({
+                        pass: p
+                    }).then(function () {
+                        console.log("Done");
+                    });
+                }
+            });
+        }
+        function remove(u) {
+            db.ref('users/' + u).once('value', function (data) {
+                if (data.val() == null) {
+                    console.log("Username dosen't exists.");
+                } else {
+                    db.ref('users/' + u).remove().then(function () {
+                        console.log("Done");
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

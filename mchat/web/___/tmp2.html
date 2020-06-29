@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .chat {
+            padding: 10px;
+            border: 1px solid red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="err"></div>
+    <div class="view" id="conv">
+        <button onclick="view('chats')">Back</button>
+        <div id="out"></div>
+        <div id="allmsg" style="border:1px solid green; margin:10px;padding:10px;"></div>
+        <input type="text" id="message" placeholder="Type a message">
+        <button id="send">Send</button>
+    </div>
+
+    <div class="view" id="chats">
+        <button onclick="logout()">Logout</button><br>
+        <input type="text" id="newchat">
+        <button id="newchatb">New</button>
+        <div id="chats2"></div>
+    </div>
+    <div class="view" id="login">
+        <input type="text" id='loginuser'><br>
+        <button onclick="login()">Login</button>
+    </div>
+    <script src="res/js/jquery.js"></script>
+    <script>
+        $.ajax({
+            type: "POST",
+            url: "http://localhost/MChat/index.php",
+            success: function (data) {
+                $('#err').html(data);
+            }
+        });
+        var user = localStorage.getItem('user');
+        var sender = "";
+        function viewh() {
+            let elems = document.getElementsByClassName("view");
+            for (i = 0; i < elems.length; i++) {
+                elems[i].style.display = "none";
+            }
+        }
+        function views(elems) {
+            viewh();
+            for (i = 0; i < elems.length; i++) {
+                document.getElementById(elems[i]).style.display = "";
+            }
+        }
+        function view(elem) {
+            viewh();
+            document.getElementById(elem).style.display = "";
+        }
+        if (localStorage.getItem("user") == null) {
+            view('login');
+        } else {
+            view('chats');
+        }
+
+        function fetch_msg() {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost/MChat/index.php",
+                data: { showMsgall: 1, user: user, receiver: receiver },
+                cache: false,
+                success: function (data) {
+                    $("#allmsg").html(data);
+                }
+            });
+        }
+        function fetch_chat() {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost/MChat/index.php",
+                data: { showMsg: 1, user: user },
+                cache: false,
+                success: function (data) {
+                    $("#chats2").html(data);
+                }
+            })
+            $("#send").click(function () {
+                var m = $("#message").val();
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost/MChat/index.php",
+                    data: { sender: user, receiver: receiver, message: m, sendMsg: 1 },
+                    cache: false,
+                    success: function (data) {
+                        $('#out').html(data);
+                        fetch_msg();
+                        $("#message").val("");
+                    }
+                });
+            });
+        }
+        fetch_chat();
+
+        $("#newchatb").click(function () {
+            view('conv');
+            receiver = $('#newchat').val();
+            fetch_msg();
+        });
+        function chat(x) {
+            view('conv');
+            receiver = $(x).attr('user');
+            fetch_msg();
+        }
+        function login() {
+            user = $("#loginuser").val();
+            window.localStorage.setItem("user", user);
+            view('chats');
+            fetch_chat();
+        }
+        function logout() {
+            window.localStorage.removeItem("user");
+            view('login');
+        }
+    </script>
+</body>
+
+</html>
