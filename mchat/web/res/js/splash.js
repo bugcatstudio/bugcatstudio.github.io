@@ -1,6 +1,7 @@
 view('splash');
 localStorage.removeItem('mchat_receiver');
 setTimeout(function () {
+    loading(true);
     $.ajax({
         url: url + 'valid.php',
         type: "POST",
@@ -11,9 +12,11 @@ setTimeout(function () {
                     window.location.href = "main.html";
                 else
                     view('newStart');
+                loading(false);
             } else {
                 view('no-response');
                 $('#valid').html(e);
+                loading(false);
             }
         },
         error: function () {

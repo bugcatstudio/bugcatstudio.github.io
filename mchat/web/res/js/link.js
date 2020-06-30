@@ -1,4 +1,4 @@
-//const url = 'https://app.bugcatstudio.ga/mchat/';
+const url = 'https://app.bugcatstudio.ga/mchat/';
 const url_profile = url + 'accounts/images/';
 const url_auth = url + 'auth.php';
 const url_user = url + 'user.php';
