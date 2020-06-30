@@ -1,26 +1,25 @@
-if (localStorage.getItem("mchat_username") != null)
-    window.location.href = "main.html";
-
-const url = "http://app.bugcatstudio.ga_/mchat/auth.php";
 var allUsers = "";
 
-function fetchUsernames() {
+function getAllUsers() {
+
     $.ajax({
-        url: url,
+        url: url_auth,
         type: "POST",
-        data: { fetchUsers: 0 },
+        data: { getAllUsers: 0 },
         success: function (e) {
             allUsers = JSON.parse(e);
         },
-        error: function (e) {
-            window.location.href = "error.html";
+        error: function () {
+            ajax_error();
         }
     });
+
 }
 
-fetchUsernames();
+getAllUsers();
 
 function usernameValidate() {
+
     let u = $('#signup-user').val();
     let uf = $('#signup-user');
     let e = $('#username-err');
@@ -48,6 +47,7 @@ function usernameValidate() {
 }
 
 function emailValidate() {
+
     let u = $('#signup-email').val();
     let uf = $('#signup-email');
     let e = $('#email-err');
@@ -67,6 +67,7 @@ function emailValidate() {
 }
 
 function passwordValidate(feild, error, button) {
+
     let uf = $('#' + feild);
     let u = uf.val();
     let e = $('#' + error);
@@ -86,6 +87,7 @@ function passwordValidate(feild, error, button) {
 }
 
 function signup_0() {
+
     let u = $('#signup-user').val();
     let e = $('#signup-email').val();
     let p = $('#signup-pass').val();
@@ -100,6 +102,7 @@ function signup_0() {
 }
 
 function textValidate(feild, err, btn, green = true) {
+
     let uf = $('#' + feild);
     let u = uf.val();
     let e = $('#' + err);
@@ -120,6 +123,7 @@ var signup_allow = true;
 var signup_img;
 
 function imageValidate(event) {
+
     signup_img = document.querySelector('#signup-image').files[0];
     if (signup_img) {
         let f = signup_img['type'];
@@ -140,15 +144,15 @@ function signup() {
 
     var form = new FormData();
 
-    form.append('signup', 1);
-    form.append('username', $('#signup-user').val().toLowerCase());
-    form.append('password', $('#signup-pass').val());
-    form.append('email', $('#signup-email').val());
-    form.append('name', $('#signup-name').val());
-    form.append('gender', $('#signup-gender').val());
+    form.append('userSignUp', 1);
+    form.append('u', $('#signup-user').val().toLowerCase());
+    form.append('p', $('#signup-pass').val());
+    form.append('e', $('#signup-email').val());
+    form.append('n', $('#signup-name').val());
+    form.append('g', $('#signup-gender').val());
 
     if (signup_img)
-        form.append('image', signup_img);
+        form.append('i', signup_img);
 
     if (signup_allow) {
         let n = $('#signup-name').val();
@@ -157,7 +161,7 @@ function signup() {
         else {
             $.ajax({
                 type: "POST",
-                url: url,
+                url: url_auth,
                 data: form,
                 processData: false,
                 contentType: false,
@@ -165,12 +169,13 @@ function signup() {
                     if (e) {
                         localStorage.setItem("mchat_username", $('#signup-user').val());
                         localStorage.setItem("mchat_user_name", $('#signup-name').val());
-                        window.location.href="main.html";
-                    }
+                        if (signup_img)
+                            localStorage.setItem("mchat_user_profile", 1);
+                        window.location.href = "main.html";
+                    } else ajax_error();
                 },
                 error: function () {
-                    popup('Something went Wrong. Unable to connect to the server. Please Try again.');
-                    //window.location.href = "error.html";
+                    ajax_error();
                 }
             });
         }
@@ -178,6 +183,7 @@ function signup() {
 }
 
 function login() {
+
     loading(true);
     let uf = $('#login-user');
     let pf = $('#login-pass');
@@ -206,38 +212,38 @@ function login() {
             //uf.addClass('border-danger');
         } else {
             $.ajax({
-                url: url,
+                url: url_auth,
                 type: "POST",
-                data: { u: u, p: p, login: 1 },
+                data: { u: u, p: p, userLogin: 1 },
                 success: function (e) {
                     e = JSON.parse(e);
                     if (e[0] == true) {
                         if (e[2] == 1) {
                             localStorage.setItem('mchat_username', u);
                             localStorage.setItem('mchat_user_name', e[1]);
-                            window.location.href="main.html";
+                            localStorage.setItem('mchat_user_profile', e[3]);
+                            window.location.href = "main.html";
                         } else if (e[2] == 2) {
                             popup('This Account has been banned for Voilation. Please contact <a href=\'mailto:bugcatstudio@gmail.com\'>here</a> to reactivate your Account.')
                             loading(false);
                         }
-                    } else {
+                    } else if (e[0] == false) {
                         popup('Your Password is Incorrect. Please Try Again');
-                        //pf.addClass('border-danger');
                         pf.html('');
                         loading(false);
                     }
+                    else ajax_error();
                 },
                 error: function () {
-                    popup('Something went Wrong. Unable to connect to the server. Please Try again.');
-                    //window.location.href = "error.html";
-                    loading(false);
-
+                    ajax_error();
                 }
             });
         }
     }
 }
+var code;
 function reset_0() {
+
     loading(true);
     let uf = $('#reset-user');
     let u = uf.val().replace(/[|&;$%@"<>()+,]/g, " ").toLowerCase();
@@ -257,28 +263,26 @@ function reset_0() {
         else {
             $.ajax({
                 type: "POST",
-                url: url,
-                data: { u: u, reset_mail: 1 },
+                url: url_auth,
+                data: { u: u, sendPasswordResetEmail: 1 },
                 success: function (e) {
                     e = JSON.parse(e);
                     if (e[0] == true) {
-                        $code = e[1];
+                        code = e[1];
                         view('forgot-view-2');
                         loading(false);
-                    } else {
-                        popup('Something went Wrong. Unable to send you a verification Email. Please Try again.');
-                        loading(false);
-                    }
+                        popup('An email has been sent to your email address. Use the Verification code given in Email to reset Password.');
+                    } else ajax_error();
                 },
                 error: function () {
-                    popup('Something went Wrong. Unable to connect to the server. Please Try again.');
-                    loading(false);
+                    ajax_error();
                 }
             });
         }
     }
 }
 function reset() {
+
     loading(true);
     let cf = $('#reset-code');
     let pf = $('#reset-pass');
@@ -299,26 +303,28 @@ function reset() {
         pe.html("Please enter Password.");
         pf.addClass('border-danger');
         loading(false);
+    } else if (c != code) {
+        popup('Verification code entered by you is incorrect. Please try again.');
+        loading(false);
     }
     else {
         $.ajax({
-            url: url,
+            url: url_auth,
             type: "POST",
-            data: { u: $('#reset-user').val(), p: p, reset: 1 },
+            data: { u: $('#reset-user').val(), p: p, userPasswordReset: 1 },
             success: function (e) {
                 e = JSON.parse(e);
                 if (e[0] == true) {
                     popup('Your Password has been changed successfully.');
+                    $('input').val('');
                     view('login-view');
                     loading(false);
-                } else {
-                    popup('Verification code entered by you is incorrect. Please try again.');
-                    loading(false);
+                } else if (e[0] == false) {
+                    ajax_error();
                 }
             },
             error: function () {
-                popup('Something went Wrong. Unable to connect to the server. Please Try again.');
-                loading(false);
+                ajax_error();
             }
         });
     }

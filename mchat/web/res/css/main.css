@@ -46,6 +46,10 @@ body {
     animation: none !important;
 }
 
+input, textarea {
+    outline: none;
+}
+
 @keyframes view {
     0% {
         margin-left: 100px;
@@ -106,12 +110,13 @@ body {
     display: flex;
     transform: scale(1);
 }
-.popup-open>#popup-inner{
+
+.popup-open>#popup-inner {
     display: block;
 }
 
-@keyframes popup{
-    0%{
+@keyframes popup {
+    0% {
         transform: scale(.8);
         opacity: 0;
     }
@@ -138,12 +143,13 @@ body {
     border-top-color: transparent;
     animation: loading .7s infinite linear;
 }
-.loading-on{
+
+.loading-on {
     display: flex;
 }
 
-@keyframes loading{
-    100%{
+@keyframes loading {
+    100% {
         transform: rotate(360deg);
     }
 }

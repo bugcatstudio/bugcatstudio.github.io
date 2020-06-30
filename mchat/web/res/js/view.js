@@ -20,7 +20,6 @@ $('body').append("<div id=\"loading\" class=\"loading\"><div></div></div>");
 function popup(msg, title = "Alert") {
     pi = $('#popup-inner');
     pi.html(msg);
-    //pi.prepend("<div id=\"popup-close-btn\" onclick=\"popup_hide()\">&times;</div>");
     pi.prepend("<div id=\"popup-title\">" + title + "</div>");
     pi.append("<br><br><button class=\'btn btn-light border btn-sm w-50 float-right\' onclick='popup_hide()'>Ok</button>");
     $('#popup').addClass('popup-open');

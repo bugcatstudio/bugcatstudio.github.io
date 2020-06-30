@@ -12,6 +12,23 @@
     animation: shadow 2s forwards;
 }
 
+.newStart-anim {
+    text-align: center;
+    width: 50%;
+    border-radius: 6px;
+    max-height: 0;
+    transform-origin: 50% 50%;
+    animation: 1.5s newStart 1s forwards;
+    overflow: hidden;
+}
+
+@keyframes newStart {
+    100% {
+        max-height: 500px;
+        padding: 20px;
+    }
+}
+
 @keyframes splash {
     0% {
         padding-bottom: 150px;
